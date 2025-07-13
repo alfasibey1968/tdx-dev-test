@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Login | TDX Entertainment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { background: #16161a; color: #FFD700; font-family: Arial,sans-serif;}
+    .admin-login { max-width: 350px; margin: 90px auto; background: #232103; padding: 2em; border-radius: 12px; box-shadow: 0 2px 10px #FFD70040; }
+    h2 { text-align: center; color: #FFD700; margin-bottom:1.2em;}
+    input { width:100%; padding:10px; margin:1em 0 0.3em 0; border:1px solid #ffd70088; border-radius:5px; background:#222; color:#FFD700; font-size:1.1em;}
+    button { width:100%; background: #FFD700; color:#222; padding:12px; border:none; border-radius:6px; font-size:1.13em; font-weight:bold; margin-top:0.7em; cursor:pointer; }
+    button:hover {background: #ffe066;}
+    .flashed { color: #ffd700; text-align:center; margin-top:1em;}
+    a { display:block; text-align:center; color:#FFD700; margin-top:1.8em; }
+  </style>
+</head>
+<body>
+  <div class="admin-login">
+    <h2>Admin Panel Login</h2>
+    <form method="post">
+      {{ form.hidden_tag() }}
+      <input type="password" name="password" placeholder="Admin Password">
+      <button type="submit">Login</button>
+    </form>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flashed">
+        {% for message in messages %}{{ message }}<br>{% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+    <a href="{{ url_for('index') }}">Back to main portal</a>
+  </div>
+</body>
+</html>

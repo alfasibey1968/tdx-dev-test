@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Video Banner</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { background:#16161a;color:#FFD700;font-family:Arial,sans-serif; }
+    .box { max-width: 480px; margin:38px auto; background:#232103; border-radius:12px; padding:2em; border:2px solid #FFD70077;}
+    label{font-weight:bold;display:block;margin-bottom:.6em;}
+    input[type="file"]{margin:1em 0;}
+    button {background:#FFD700;color:#232103;font-weight:bold;padding:8px 32px;border-radius:6px;border:none;margin:12px 8px 0 0;font-size:1.14em;}
+    .flashes{color:#FFD700;margin:13px 0;}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Upload/Update Video Banner (mp4)</h2>
+    {% if banner_url %}
+      <div style="margin:1em auto; max-width:460px;">
+        <video src="{{ banner_url }}" muted autoplay loop style="width:420px;max-width:100%;border:3px solid #ffd700;border-radius:8px;background:#111;box-shadow:0 2px 20px #FFD70044;"></video>
+        <div style="color:#FFD700A0;font-size:.98em;margin:.9em 0 .1em 0;">Current Banner Video</div>
+      </div>
+    {% endif %}
+    <form method="post" enctype="multipart/form-data">
+      <label>Choose MP4 File (landscape, &lt;2MB recommended):</label>
+      <input type="file" name="banner_video" accept="video/mp4" required>
+      <button type="submit">Upload Banner Video</button>
+      {% if banner_url %}
+        <button type="submit" name="clear" value="1" onclick="return confirm('Clear banner?')">Clear Banner</button>
+      {% endif %}
+    </form>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flashes">{% for message in messages %}{{ message }}<br>{% endfor %}</div>
+      {% endif %}
+    {% endwith %}
+    <div style="margin-top:32px;">
+      <a href="{{ url_for('admin_dashboard') }}" style="color:#ffd700;">Back to Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>

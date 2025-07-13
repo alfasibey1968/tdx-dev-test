@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Edit Rolling Banner</title>
+  <style>
+    body{background:#16161a;color:#ffd700;font-family:Arial,sans-serif;}
+    .box { max-width: 440px; margin: 40px auto; background: #232103; border-radius:11px; padding:2em; border:2px solid #FFD70077;}
+    label { font-weight:bold;display:block;margin-bottom:.7em;}
+    textarea {width:100%;min-height:65px;background:#201a0a;color:#FFD700;font-size:1.09em;border-radius:7px;}
+    button {background:#FFD700;color:#232103;font-weight:bold;padding:8px 32px;border-radius:6px;border:none;margin:16px 8px 0 0;font-size:1.12em;}
+    .flashes{color:#ffd700;margin:10px 0;}
+  </style>
+</head>
+<body>
+  <div class="box">
+    <h2>Edit Rolling Banner Message</h2>
+    <form method="post">
+      <label>Banner Text:</label>
+      <textarea name="banner_message" placeholder="Enter gold banner text...">{{ banner_message }}</textarea>
+      <button type="submit">Update Banner</button>
+      <button type="submit" name="clear" value="1" onclick="return confirm('Clear banner?')">Clear Banner</button>
+    </form>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <div class="flashes">{% for message in messages %}{{ message }}<br>{% endfor %}</div>
+      {% endif %}
+    {% endwith %}
+    <div style="margin-top:30px;">
+      <a href="{{ url_for('admin_dashboard') }}">Back to Dashboard</a>
+    </div>
+  </div>
+</body>
+</html>

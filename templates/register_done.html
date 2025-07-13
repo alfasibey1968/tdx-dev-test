@@ -1,0 +1,39 @@
+<!doctype html>
+<html>
+<head>
+  <title>Registration Complete</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {background:#16161a;color:#FFD700;font-family:Arial,sans-serif;}
+    .reg-box { max-width: 410px; margin: 90px auto; background: #232103; border-radius: 12px; box-shadow: 0 2px 14px #FFD70040; padding: 2em;}
+    h2 {text-align:center;}
+    .qrimg { display:block; margin:1.3em auto;}
+  </style>
+</head>
+<body>
+{% set banner = get_banner_message() %}
+{% if banner %}
+  <div id="tdx-banner-box">
+    <span id="tdx-banner-content">{{ banner }}</span>
+  </div>
+  <style>
+    #tdx-banner-box { width:100vw;min-width:320px;max-width:100vw;position:fixed;left:0;top:0;z-index:1101;background: linear-gradient(90deg,#201a0a,#FFD700b7 85%,#201a0a);border-bottom:2px solid #ffd70088; box-shadow: 0 2px 18px #FFD70055;}
+    #tdx-banner-content { display:inline-block; color: #222; font-size: 1.11em; font-weight: bold; letter-spacing:0.04em; text-shadow: 0 1px 10px #FFD70066, 0 2px 8px #0005; white-space:nowrap; animation: tdx-banner-scroll 15s linear infinite; padding:10px 58vw 10px 0;}
+    @keyframes tdx-banner-scroll { 0%{transform:translateX(110vw);} 100%{transform:translateX(-100%);} }
+    body {padding-top:50px !important;}
+  </style>
+{% endif %}
+<div class="reg-box">
+  <h2>Registration Complete!</h2>
+  <p>Name: {{ passenger['name'] }}<br>Phone: {{ passenger['phone'] }}<br>Email: {{ passenger['email'] }}</p>
+  <div style="font-size:1.14em; margin-bottom:.5em;">
+    Your Loyalty/Passenger ID: <b>{{ pid }}</b>
+  </div>
+  <img class="qrimg" src="/static/qr/{{ pid }}.png" width="100" height="100" alt="Your QR">
+  <div>Show this code/QR on any TDX bus to earn rewards!</div>
+  <div style="text-align:center; margin:1em;">
+    <a href="{{ url_for('index') }}">Return to Login</a>
+  </div>
+</div>
+</body>
+</html>

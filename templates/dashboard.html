@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>TDX Bus Dashboard</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <style>
+    body { background: #16161a; color: #FFD700; font-family: 'Segoe UI',Arial,sans-serif; min-height: 100vh;}
+    .topbar {
+      background: linear-gradient(90deg,#22232b,#242424 87%);
+      color:#FFD700; text-align:center; font-weight:bold;
+      border-bottom: 3px solid #FFD700; box-shadow:0 3px 18px #171717;
+      padding: 26px 0 22px 0; border-radius:0 0 38px 38px;
+      margin-bottom: 16px;
+      position: relative;
+    }
+    .admin-btn {
+      position: absolute;
+      right: 26px;
+      top: 9px;
+      z-index: 1202;
+      background:#FFD700;
+      color:#16161a !important;
+      border-radius:7px;
+      padding:.47em 1.5em;
+      font-size:1.1em;
+      font-weight:700;
+      text-decoration:none;
+      box-shadow:0 1px 6px #FFD70055;
+      border: none;
+      cursor: pointer;
+    }
+    .section-label { font-size:1.2em; color:#FFD700;font-weight:bold; margin:2em 0 1em 2vw; letter-spacing:.06em;}
+    .cat-grid {display:flex;flex-wrap:wrap;gap:1.6em;justify-content:center;margin-bottom:22px;}
+    .cat-card { background: #22232b; width:170px; border-radius:15px;
+      box-shadow: 0 2px 16px #FFD70040, 0 1px 8px #4448;
+      border: 2px solid #FFD70099; transition:.17s box-shadow,.17s transform;text-align:center;
+      color:#ffe779;overflow: hidden;cursor:pointer;}
+    .cat-card:hover {box-shadow:0 8px 44px #ffd700b1,0 2px 12px #222; transform: scale(1.05);}
+    .cat-thumb { width:100%; height:99px; object-fit:cover; border-top-left-radius:15px;border-top-right-radius:15px;
+      border-bottom: 1px solid #e3c15044; background: #201a0a;}
+    .cat-label {padding:14px 0 11px 0;font-size:1.02em;font-weight:500;color:#ffd700;}
+    a { color:#FFD700; text-decoration: none;}
+    .loy-link {font-size:1.1em; color:#FFD700;text-align:center; margin: 13px;}
+    @media (max-width:750px) {.cat-card {width:46vw;min-width:130px;max-width:175px;} }
+    @media (max-width:510px) {.cat-card {width:99vw;max-width:96vw;} .topbar{padding:12px;}}
+  </style>
+</head>
+<body>
+  {% set banner = get_banner_message() %}
+  {% if banner %}
+    <div id="tdx-banner-box">
+      <span id="tdx-banner-content">{{ banner }}</span>
+    </div>
+    <style>
+      #tdx-banner-box {
+        width:100vw; min-width:320px; max-width:100vw; position:fixed;left:0;top:0;z-index:1101;
+        background: linear-gradient(90deg,#201a0a,#FFD700b7 80%,#201a0a 100%);
+        border-bottom:2px solid #ffd70088; box-shadow: 0 2px 18px #FFD70055;}
+      #tdx-banner-content {
+        display:inline-block; color: #222; font-size: 1.13em; font-weight: bold; letter-spacing:0.04em;
+        text-shadow: 0 1px 10px #FFD70066, 0 2px 8px #0005; white-space:nowrap;
+        animation: tdx-banner-scroll 15s linear infinite; padding:10px 60vw 10px 0;}
+      @keyframes tdx-banner-scroll { 0%{transform:translateX(110vw);} 100%{transform:translateX(-100%);} }
+      body {padding-top:54px !important;}
+    </style>
+  {% endif %}
+
+  <div class="topbar">
+    <span style="font-size:1.35em;">TDX Entertainment — Seat <b style="color:#fff;">{{ seat }}</b></span>
+
+    <div style="font-size:.98em;margin-top:8px;color:#ffd700dd;">Bus: {{ bus.registration }} &bullet; Route: {{ bus.route }} &bullet; ETA: {{ bus.estimated_arrival }}</div>
+  </div>
+  <div>
+    {% if passenger %}
+      <div class="loy-link"><a href="{{ url_for('loyalty_profile', pid=session['pid']) }}">My Loyalty QR & Points ({{passenger['name']}})</a></div>
+    {% endif %}
+    <div class="section-label">Movies</div>
+    <div class="cat-grid">
+    {% for sub in ['action','african','romance','comedy'] %}
+      <div class="cat-card" onclick="location.href='{{ url_for('browse_movies', subcat=sub) }}';">
+        <img src="{{ url_for('static', filename='thumbnails/' + sub + '.jpg') }}"
+             alt="{{ sub|capitalize }}" class="cat-thumb"
+             onerror="this.onerror=null;this.src='https://via.placeholder.com/170x99/201a0a/ffd700?text={{sub|capitalize}}';">
+        <div class="cat-label">{{ sub|capitalize }}</div>
+      </div>
+    {% endfor %}
+    </div>
+    <div class="section-label">Musical Videos</div>
+    <div class="cat-grid">
+    {% for sub in ['afrobeat_videos','gospel','rnb','reggae','rap'] %}
+      <div class="cat-card" onclick="location.href='{{ url_for('browse_musical_videos', subcat=sub) }}';">
+        <img src="{{ url_for('static', filename='thumbnails/' + sub + '.jpg') }}"
+           alt="{{ sub|capitalize }}" class="cat-thumb"
+           onerror="this.onerror=null;this.src='https://via.placeholder.com/170x99/201a0a/ffd700?text={{sub|replace('_',' ')|capitalize}}';">
+        <div class="cat-label">{{ sub|replace('_',' ')|capitalize }}</div>
+      </div>
+    {% endfor %}
+    </div>
+    <div class="section-label">Documentaries</div>
+    <div class="cat-grid">
+    {% for sub in ['doc1','doc2','doc3'] %}
+      <div class="cat-card" onclick="location.href='{{ url_for('browse_docs', subcat=sub) }}';">
+        <img src="{{ url_for('static', filename='thumbnails/' + sub + '.jpg') }}"
+           alt="{{ sub|capitalize }}" class="cat-thumb"
+           onerror="this.onerror=null;this.src='https://via.placeholder.com/170x99/201a0a/ffd700?text={{sub|capitalize}}';">
+        <div class="cat-label">{{ sub|capitalize }}</div>
+      </div>
+    {% endfor %}
+    </div>
+    <div class="section-label">Music</div>
+    <div class="cat-grid">
+    {% for sub in ['afrobeat','reggae','hiphop','rnb','gospel'] %}
+      <div class="cat-card" onclick="location.href='{{ url_for('browse_music', subcat=sub) }}';">
+        <img src="{{ url_for('static', filename='thumbnails/' + sub + '.jpg') }}"
+           alt="{{ sub|capitalize }}" class="cat-thumb"
+           onerror="this.onerror=null;this.src='https://via.placeholder.com/170x99/201a0a/ffd700?text={{sub|replace('_',' ')|capitalize}}';">
+        <div class="cat-label">{{ sub|replace('_',' ')|capitalize }}</div>
+      </div>
+    {% endfor %}
+    </div>
+    <div class="section-label">Games</div>
+    <div class="cat-grid">
+    {% if games|length == 0 %}
+      <div style="color:#FFD700;font-weight:600;">No games available</div>
+    {% endif %}
+    {% for g in games %}
+      <div class="cat-card" onclick="location.href='{{ url_for('games_view', gamename=g) }}';">
+        <img src="{{ url_for('static', filename='thumbnails/' + g + '.jpg') }}"
+           alt="{{ g|capitalize }}" class="cat-thumb"
+           onerror="this.onerror=null;this.src='https://via.placeholder.com/170x99/201a0a/ffd700?text={{g|capitalize}}';">
+        <div class="cat-label">{{ g|replace('_',' ')|capitalize }}</div>
+      </div>
+    {% endfor %}
+    </div>
+    <div style="text-align:center;margin:22px 0 6px;">
+      <a style="color:#FFD700; font-size:1.16em;" href="{{ url_for('gps_map') }}">Show Journey Map</a>
+    </div>
+  </div>
+</body>
+</html>

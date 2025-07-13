@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Admin Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { background: #16161a; color: #FFD700; font-family: 'Segoe UI', Arial, sans-serif; }
+    .container { max-width: 1120px; margin: 2em auto; }
+    .block { background: #232103; border-radius: 10px; box-shadow: 0 2px 10px #FFD70060; padding: 32px; margin-bottom: 32px; }
+    .menu-bar { background: #201a0a; padding: 12px 24px; margin-bottom: 20px; border-radius: 9px; border:1px solid #d8b43e40;}
+    .menu-bar a { color: #FFD700; margin-right: 1.6em; text-decoration: none; font-weight: bold; }
+    .section-label { font-size: 1.2em; color: #FFD700; font-weight: bold; margin-bottom: 8px; }
+    ul { list-style: none; padding-left: 0; }
+    li { margin: 8px 0; background:#222106; border-radius:7px; }
+    .inline-form { display: inline-block; vertical-align:middle; margin: 0 4px; }
+    label { font-weight: bold; }
+    .del-btn { background: #d80032; color: #fff; border: none; border-radius: 20px; padding: 2px 14px; cursor: pointer; margin-left: 7px; }
+    button.upload, .banner-btn { background: #FFD700; color: #232106; font-weight: bold; border: none; border-radius: 7px; padding: 6px 15px; margin-left: 8px;}
+    input[type="file"] { margin-left: 9px; font-size: 1em;}
+    .flashes { color: #FFD700; margin-bottom: 11px; }
+    .profile-list { margin-top: 10px; color: #ffdca9; font-size:.98em;}
+    .banner-form {margin:0 0 26px 0;}
+  </style>
+</head>
+<body>
+  {% set banner = get_banner_message() %}
+  {% if banner %}
+    <div id="tdx-banner-box">
+      <span id="tdx-banner-content">{{ banner }}</span>
+    </div>
+    <style>
+      #tdx-banner-box {
+        width:100vw; min-width:340px; max-width:100vw; position:fixed; left:0; top:0; z-index:1101;
+        background:linear-gradient(90deg,#201a0a,#FFD700b7 80%,#201a0a 100%);
+        border-bottom:2px solid #ffd70088; box-shadow: 0 2px 18px #FFD70055;
+      }
+      #tdx-banner-content {
+        display:inline-block; color: #222; font-size: 1.13em; font-weight: bold; letter-spacing:0.04em;
+        text-shadow: 0 1px 10px #FFD70066, 0 2px 8px #0005; white-space:nowrap;
+        animation: tdx-banner-scroll 15s linear infinite; padding:10px 60vw 10px 0;
+      }
+      @keyframes tdx-banner-scroll { 0%{transform:translateX(110vw);} 100%{transform:translateX(-100%);} }
+      body {padding-top:54px !important;}
+    </style>
+  {% endif %}
+  <div class="container">
+    <h2 style="color:#FFD700;">Admin Dashboard</h2>
+    <div class="menu-bar">
+      <a href="{{ url_for('admin_logout') }}">Logout</a>
+      <a href="{{ url_for('dashboard') }}">Back to dashboard</a>
+      <a href="{{ url_for('admin_download_log') }}">Download analytics/log CSV</a>
+      <a href="{{ url_for('staff_manage') }}">Edit Staff/Bus Info</a>
+      <a href="{{ url_for('admin_banner') }}" class="banner-btn">Edit Banner</a>
+    </div>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class="flashes">{% for message in messages %}<li>{{ message }}</li>{% endfor %}</ul>
+      {% endif %}
+    {% endwith %}
+
+    {% for group in [
+      ('Movies', 'movies', ['action','african','romance','comedy']),
+      ('Musical Videos', 'musical_videos', ['afrobeat_videos','gospel','rnb','reggae','rap']),
+      ('Documentaries', 'documentaries', ['doc1','doc2','doc3']),
+      ('Music', 'musics', ['afrobeat','reggae','hiphop','rnb','gospel'])
+    ] %}
+    <div class="block">
+      <div class="section-label">{{ group[0] }}</div>
+      {% for cat in group[2] %}
+        <div style="margin: 12px 0;">
+          <label>{{ cat.replace('_',' ').capitalize() }}:</label>
+          <form class="inline-form" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="formtype" value="{{ group[1] }}">
+            <input type="hidden" name="subcat" value="{{ cat }}">
+            <input type="file" name="file" required>
+            <button type="submit" class="upload">Upload</button>
+          </form>
+          {% if group[0] == 'Movies' %}
+          <form class="inline-form" method="post" action="{{ url_for('admin_upload_thumbnail') }}" enctype="multipart/form-data">
+            <input type="hidden" name="video_cat" value="{{cat}}">
+            <input type="file" name="thumbnail" required>
+            <button type="submit" class="upload">Upload Thumbnail</button>
+          </form>
+          {% endif %}
+          <ul>
+            {% set dirpath = "media/" + group[1] + "/" + cat %}
+            {% for file in (os.listdir(dirpath) if os.path.exists(dirpath) else []) %}
+              <li>
+                {{ file }}
+                <form class="inline-form" method="post" action="{{ url_for('admin_deletefile') }}">
+                  <input type="hidden" name="filepath" value="{{ dirpath }}/{{ file }}">
+                  <button type="submit" class="del-btn" onclick="return confirm('Delete {{ file }}?')">Delete</button>
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+
+    <div class="block">
+      <div class="section-label">Games (HTML5 in templates/games)</div>
+      <form class="inline-form" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="formtype" value="game">
+        <input type="file" name="file" required>
+        <button type="submit" class="upload">Upload Game</button>
+      </form>
+      <ul>
+        {% set games_path = "templates/games" %}
+        {% for g in (os.listdir(games_path) if os.path.exists(games_path) else []) %}
+          <li>
+            {{ g }}
+            <form class="inline-form" method="post" action="{{ url_for('admin_deletefile') }}">
+              <input type="hidden" name="filepath" value="{{ games_path }}/{{ g }}">
+              <button type="submit" class="del-btn" onclick="return confirm('Delete {{ g }}?')">Delete</button>
+            </form>
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+
+    <div class="block">
+      <div class="section-label">Passengers (Loyalty/Registered)</div>
+      <div class="profile-list">
+        {% if passengers %}
+          {% for pid, p in passengers.items() %}
+            <b>{{p.name}}</b> ({{p.phone}}{% if p.email%}, {{p.email}}{%endif%}) |
+            <a href="{{ url_for('loyalty_profile', pid=pid) }}">Profile & QR</a>
+            <br>
+          {% endfor %}
+        {% else %}
+          <span>No registered passengers yet.</span>
+        {% endif %}
+      </div>
+    </div>
+    <div class="block">
+      <div class="section-label">Current Bus/Staff</div>
+      <ul>
+        <li><b>Bus Reg:</b> {{ staff.reg if staff else '' }}</li>
+        <li><b>Driver:</b> {{ staff.driver if staff else '' }}, {{ staff.dphone if staff else '' }}</li>
+        <li><b>Assistant:</b> {{ staff.assistant if staff else '' }}, {{ staff.aphone if staff else '' }}</li>
+        <li><b>Owner:</b> {{ staff.owner if staff else '' }}, {{ staff.ophone if staff else '' }}</li>
+      </ul>
+    </div>
+  </div>
+</body>
+</html>
