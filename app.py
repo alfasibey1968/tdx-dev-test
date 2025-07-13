@@ -313,7 +313,13 @@ def admin_upload_thumbnail():
     thumbnail = request.files.get('thumbnail')
     if thumbnail and thumbnail.filename:
         fname = thumbnail.filename
-        thumbnail.save(os.path.join('static/thumbnails', fname))
+       s3.upload_fileobj(
+    thumbnail,
+    S3_BUCKET,
+    f"thumbnails/{fname}",
+    ExtraArgs={"ContentType": thumbnail.content_type}
+)
+
         flash(f"Thumbnail {fname} uploaded!")
     else:
         flash("No thumbnail uploaded.")
